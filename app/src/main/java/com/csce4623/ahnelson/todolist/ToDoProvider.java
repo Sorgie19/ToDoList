@@ -26,7 +26,7 @@ public class ToDoProvider extends ContentProvider {
             Uri.parse("content://" + AUTHORITY + "/"+TABLE_NAME);
 
     //Column names for the ToDoList Table
-    public static final String TODO_TABLE_COL_ID = "_ID";
+    public static final String TODO_TABLE_COL_ID = "_id";
     public static final String TODO_TABLE_COL_TITLE = "TITLE";
     public static final String TODO_TABLE_COL_CONTENT = "CONTENT";
     //Table create string based on column names

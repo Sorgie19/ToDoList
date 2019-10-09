@@ -6,6 +6,20 @@
     android:layout_height="match_parent"
     tools:context="com.csce4623.ahnelson.todolist.HomeActivity">
 
+    <Button
+        android:id="@+id/editTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Edit Title"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/btnSave"
+        app:layout_constraintStart_toEndOf="@+id/etDatePicker"
+        app:layout_constraintTop_toBottomOf="@+id/etNoteContent" />
+
     <TextView
         android:id="@+id/tvNoteTitle"
         android:layout_width="wrap_content"
@@ -23,10 +37,10 @@
         android:id="@+id/etNoteContent"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginRight="8dp"
         android:layout_marginTop="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
         android:ems="10"
         android:gravity="top"
         android:inputType="textMultiLine"
@@ -38,11 +52,11 @@
 
     <EditText
         android:id="@+id/etDatePicker"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="9dp"
+        android:layout_width="154dp"
+        android:layout_height="45dp"
         android:layout_marginLeft="8dp"
         android:layout_marginRight="8dp"
+        android:layout_marginBottom="9dp"
         android:ems="10"
         android:inputType="date"
         android:text="10/06/17 11:59"

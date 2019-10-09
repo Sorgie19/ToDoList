@@ -1,11 +1,15 @@
 package com.csce4623.ahnelson.todolist;
 
+import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -17,11 +21,12 @@ import static com.csce4623.ahnelson.todolist.ToDoProvider.TODO_TABLE_COL_TITLE;
 
 public class NoteActivity extends AppCompatActivity implements View.OnClickListener{
 
-    Button save;
+    Button save, editTitle;
     EditText noteContent, datePicker;
     TextView noteTitle;
     CheckBox taskDone;
     int position;
+    final Context c = this;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,12 +39,14 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         datePicker = (EditText) findViewById(R.id.etDatePicker);
         noteTitle = (TextView) findViewById(R.id.tvNoteTitle);
         taskDone = (CheckBox) findViewById(R.id.checkBox);
+        editTitle = (Button) findViewById(R.id.editTitle);
         getCurrentNote();
     }
 
     //Set the OnClick Listener for buttons
     void initializeComponents(){
         findViewById(R.id.btnSave).setOnClickListener(this);
+        findViewById(R.id.editTitle).setOnClickListener(this);
     }
 
     @Override
@@ -50,6 +57,8 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
                 updateNote();
                 finish();
                 break;
+            case R.id.editTitle:
+                editTitle();
             //If delete note, call deleteNewestNote()
             //This shouldn't happen
             default:
@@ -98,6 +107,36 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         //Perform the insert function using the ContentProvider
         getContentResolver().update(ToDoProvider.CONTENT_URI, myCV, ToDoProvider.TODO_TABLE_COL_ID+"=?", new String[] {String.valueOf(position + 1)});
 
+    }
+
+    public void editTitle()
+    {
+        LayoutInflater layoutInflaterAndroid = LayoutInflater.from(c);
+        View mView = layoutInflaterAndroid.inflate(R.layout.input_dialog, null);
+        AlertDialog.Builder alertDialogBuilderUserInput = new AlertDialog.Builder(c);
+        alertDialogBuilderUserInput.setView(mView);
+
+        final EditText userInputDialogEditText = (EditText) mView.findViewById(R.id.edittext);
+        alertDialogBuilderUserInput
+                .setCancelable(false)
+                .setPositiveButton("Create", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialogBox, int id) {
+                        ContentValues myCV = new ContentValues();
+                        myCV.put(TODO_TABLE_COL_TITLE, userInputDialogEditText.getText().toString());
+                        getContentResolver().update(ToDoProvider.CONTENT_URI, myCV, ToDoProvider.TODO_TABLE_COL_ID+"=?", new String[] {String.valueOf(position + 1)});
+                        noteTitle.setText(userInputDialogEditText.getText().toString());
+                    }
+                })
+
+                .setNegativeButton("Cancel",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialogBox, int id) {
+                                dialogBox.cancel();
+                            }
+                        });
+
+        AlertDialog alertDialogAndroid = alertDialogBuilderUserInput.create();
+        alertDialogAndroid.show();
     }
 
 

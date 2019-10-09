@@ -52,14 +52,12 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v){
         switch (v.getId()){
-            //If new Note, call createNewNote()
             case R.id.btnSave:
                 updateNote();
                 finish();
                 break;
             case R.id.editTitle:
                 editTitle();
-            //If delete note, call deleteNewestNote()
             //This shouldn't happen
             default:
                 break;
@@ -77,7 +75,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
                 ToDoProvider.TODO_TABLE_COL_COMPLETED};
 
 
-        //Perform the query, with ID Descending
+        //Perform the query, gets all data
         Cursor myCursor = getContentResolver().query(ToDoProvider.CONTENT_URI,projection,null,null,null);
         if(myCursor != null & myCursor.getCount() > 0) {
             //Move the cursor to the beginning

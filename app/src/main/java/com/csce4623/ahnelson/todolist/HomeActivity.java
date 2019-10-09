@@ -38,7 +38,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(intent);
             }
         });
-
     }
 
     @Override
@@ -59,7 +58,6 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             //If new Note, call createNewNote()
             case R.id.btnNewNote:
                 alertDialogInput();
-
                 break;
             //If delete note, call deleteNewestNote()
             case R.id.btnDeleteNote:
@@ -84,7 +82,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         String[] projection = {
                 ToDoProvider.TODO_TABLE_COL_ID,
                 ToDoProvider.TODO_TABLE_COL_TITLE,
-                ToDoProvider.TODO_TABLE_COL_CONTENT};
+                ToDoProvider.TODO_TABLE_COL_CONTENT,
+                ToDoProvider.TODO_TABLE_COL_DATE,
+                ToDoProvider.TODO_TABLE_COL_COMPLETED};
         //Perform a query to get all rows in the DB
         Cursor myCursor = getContentResolver().query(ToDoProvider.CONTENT_URI,projection,null,null,null);
         //Create a toast message which states the number of rows currently in the database
@@ -98,7 +98,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         String[] projection = {
                 ToDoProvider.TODO_TABLE_COL_ID,
                 ToDoProvider.TODO_TABLE_COL_TITLE,
-                ToDoProvider.TODO_TABLE_COL_CONTENT};
+                ToDoProvider.TODO_TABLE_COL_CONTENT,
+                ToDoProvider.TODO_TABLE_COL_DATE,
+                ToDoProvider.TODO_TABLE_COL_COMPLETED};
 
         //Perform the query, with ID Descending
         Cursor myCursor = getContentResolver().query(ToDoProvider.CONTENT_URI,projection,null,null,"_ID DESC");
@@ -126,7 +128,9 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         String[] projection = {
                 ToDoProvider.TODO_TABLE_COL_ID,
                 ToDoProvider.TODO_TABLE_COL_TITLE,
-                ToDoProvider.TODO_TABLE_COL_CONTENT};
+                ToDoProvider.TODO_TABLE_COL_CONTENT,
+                ToDoProvider.TODO_TABLE_COL_DATE,
+                ToDoProvider.TODO_TABLE_COL_COMPLETED};
         Cursor myCursor = getContentResolver().query(ToDoProvider.CONTENT_URI,projection,null,null,null);
         TodoCursorAdapter todoCursorAdapter = new TodoCursorAdapter(this, myCursor);
         listView.setAdapter(todoCursorAdapter);

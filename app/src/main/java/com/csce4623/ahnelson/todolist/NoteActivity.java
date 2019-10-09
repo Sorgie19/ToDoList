@@ -35,10 +35,6 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         noteTitle = (TextView) findViewById(R.id.tvNoteTitle);
         taskDone = (CheckBox) findViewById(R.id.checkBox);
         getCurrentNote();
-
-
-        if (taskDone.isChecked())
-            taskDone.setChecked(false);
     }
 
     //Set the OnClick Listener for buttons
@@ -67,7 +63,9 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         String[] projection = {
                 ToDoProvider.TODO_TABLE_COL_ID,
                 ToDoProvider.TODO_TABLE_COL_TITLE,
-                ToDoProvider.TODO_TABLE_COL_CONTENT};
+                ToDoProvider.TODO_TABLE_COL_CONTENT,
+                ToDoProvider.TODO_TABLE_COL_DATE,
+                ToDoProvider.TODO_TABLE_COL_COMPLETED};
 
 
         //Perform the query, with ID Descending
@@ -77,6 +75,12 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
             myCursor.moveToPosition(position);
             noteTitle.setText(myCursor.getString(1));
             noteContent.setText(myCursor.getString(2));
+            datePicker.setText(myCursor.getString(3));
+
+            if(myCursor.getInt(4) == 1)
+                taskDone.setChecked(true);
+            else
+                taskDone.setChecked(false);
         }
 
     }
@@ -86,6 +90,11 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         ContentValues myCV = new ContentValues();
         //Put key_value pairs based on the column names, and the values
         myCV.put(ToDoProvider.TODO_TABLE_COL_CONTENT, noteContent.getText().toString());
+        myCV.put(ToDoProvider.TODO_TABLE_COL_DATE, datePicker.getText().toString());
+        if (taskDone.isChecked())
+            myCV.put(ToDoProvider.TODO_TABLE_COL_COMPLETED, 1);
+        else
+            myCV.put(ToDoProvider.TODO_TABLE_COL_COMPLETED, 0);
         //Perform the insert function using the ContentProvider
         getContentResolver().update(ToDoProvider.CONTENT_URI, myCV, ToDoProvider.TODO_TABLE_COL_ID+"=?", new String[] {String.valueOf(position + 1)});
 

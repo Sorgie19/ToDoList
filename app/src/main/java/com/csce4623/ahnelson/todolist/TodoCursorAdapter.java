@@ -29,9 +29,9 @@ public class TodoCursorAdapter extends CursorAdapter {
         TextView tvBody = (TextView) view.findViewById(R.id.tvBody);
         // Extract properties from cursor
         String title = cursor.getString(cursor.getColumnIndexOrThrow("TITLE"));
-        String note = cursor.getString(cursor.getColumnIndexOrThrow("CONTENT"));
+        String priority = cursor.getString(cursor.getColumnIndexOrThrow("CONTENT"));
         // Populate fields with extracted properties
         tvTitle.setText(title);
-        tvBody.setText(String.valueOf(note));
+        tvBody.setText(String.valueOf(priority));
     }
 }

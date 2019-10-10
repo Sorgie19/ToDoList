@@ -1,12 +1,16 @@
 package com.csce4623.ahnelson.todolist;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.database.Cursor;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,6 +19,12 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 
 import static com.csce4623.ahnelson.todolist.ToDoProvider.TODO_TABLE_COL_CONTENT;
 import static com.csce4623.ahnelson.todolist.ToDoProvider.TODO_TABLE_COL_TITLE;
@@ -27,6 +37,12 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
     CheckBox taskDone;
     int position;
     final Context c = this;
+    private BroadcastReceiver broadcastReceiver;
+    public static final String MyPREFERENCES = "MyPrefs";
+    public static final String Connected = "connectivityKey";
+    SharedPreferences sharedpreferences;
+    int connectivityStatus;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,7 +56,22 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         noteTitle = (TextView) findViewById(R.id.tvNoteTitle);
         taskDone = (CheckBox) findViewById(R.id.checkBox);
         editTitle = (Button) findViewById(R.id.editTitle);
+        broadcastReceiver = new NetworkChangeReceiver();
+        sharedpreferences = getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         getCurrentNote();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter intentFilter = new IntentFilter("android.net.conn.CONNECTIVITY_CHANGE");
+        registerReceiver(broadcastReceiver, intentFilter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        unregisterReceiver(broadcastReceiver);
     }
 
     //Set the OnClick Listener for buttons
@@ -94,16 +125,34 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
 
     public void updateNote()
     {
-        ContentValues myCV = new ContentValues();
-        //Put key_value pairs based on the column names, and the values
-        myCV.put(ToDoProvider.TODO_TABLE_COL_CONTENT, noteContent.getText().toString());
-        myCV.put(ToDoProvider.TODO_TABLE_COL_DATE, datePicker.getText().toString());
-        if (taskDone.isChecked())
-            myCV.put(ToDoProvider.TODO_TABLE_COL_COMPLETED, 1);
+        if(sharedpreferences.getInt(Connected, connectivityStatus) == 0) {
+            ContentValues myCV = new ContentValues();
+            //Put key_value pairs based on the column names, and the values
+            myCV.put(ToDoProvider.TODO_TABLE_COL_CONTENT, noteContent.getText().toString());
+            myCV.put(ToDoProvider.TODO_TABLE_COL_DATE, datePicker.getText().toString());
+            if (taskDone.isChecked())
+                myCV.put(ToDoProvider.TODO_TABLE_COL_COMPLETED, 1);
+            else
+                myCV.put(ToDoProvider.TODO_TABLE_COL_COMPLETED, 0);
+            //Perform the insert function using the ContentProvider
+            getContentResolver().update(ToDoProvider.CONTENT_URI, myCV, ToDoProvider.TODO_TABLE_COL_ID + "=?", new String[]{String.valueOf(position + 1)});
+        }
         else
-            myCV.put(ToDoProvider.TODO_TABLE_COL_COMPLETED, 0);
-        //Perform the insert function using the ContentProvider
-        getContentResolver().update(ToDoProvider.CONTENT_URI, myCV, ToDoProvider.TODO_TABLE_COL_ID+"=?", new String[] {String.valueOf(position + 1)});
+        {
+            String titleOfNote = noteTitle.getText().toString();
+            String contentOfNote = noteContent.getText().toString();
+            String dueDate = datePicker.getText().toString();
+            int checkedBox;
+            if(taskDone.isChecked())
+                checkedBox = 1;
+            else
+                checkedBox = 0;
+
+            String lineToWrite = titleOfNote + " " + contentOfNote + " " + dueDate + " " + checkedBox + "\n";
+
+
+
+        }
 
     }
 
@@ -119,10 +168,16 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
                 .setCancelable(false)
                 .setPositiveButton("Create", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogBox, int id) {
-                        ContentValues myCV = new ContentValues();
-                        myCV.put(TODO_TABLE_COL_TITLE, userInputDialogEditText.getText().toString());
-                        getContentResolver().update(ToDoProvider.CONTENT_URI, myCV, ToDoProvider.TODO_TABLE_COL_ID+"=?", new String[] {String.valueOf(position + 1)});
-                        noteTitle.setText(userInputDialogEditText.getText().toString());
+                        if(sharedpreferences.getInt(Connected, connectivityStatus) == 0) {
+                            ContentValues myCV = new ContentValues();
+                            myCV.put(TODO_TABLE_COL_TITLE, userInputDialogEditText.getText().toString());
+                            getContentResolver().update(ToDoProvider.CONTENT_URI, myCV, ToDoProvider.TODO_TABLE_COL_ID + "=?", new String[]{String.valueOf(position + 1)});
+                            noteTitle.setText(userInputDialogEditText.getText().toString());
+                        }
+                        else
+                        {
+
+                        }
                     }
                 })
 
@@ -136,6 +191,8 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         AlertDialog alertDialogAndroid = alertDialogBuilderUserInput.create();
         alertDialogAndroid.show();
     }
+
+
 
 
 }

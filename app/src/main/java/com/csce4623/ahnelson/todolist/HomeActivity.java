@@ -1,8 +1,10 @@
 package com.csce4623.ahnelson.todolist;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -45,17 +47,18 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if(sharedpreferences.getInt(Connected, connectivityStatus) == 0) {
+                //if(sharedpreferences.getInt(Connected, connectivityStatus) == 0) {
                     Intent intent = new Intent(view.getContext(), NoteActivity.class);
                     intent.putExtra("POSITION", i);
                     startActivity(intent);
-                }
-                else
-                {
-                    Toast.makeText(getApplicationContext(), "Not connected to the internet", Toast.LENGTH_LONG).show();
-                }
+                //}
+                //else
+                //{
+                //    Toast.makeText(getApplicationContext(), "Not connected to the internet", Toast.LENGTH_LONG).show();
+                //}
             }
         });
+
     }
 
     @Override
@@ -81,6 +84,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     void initializeComponents() {
         findViewById(R.id.btnNewNote).setOnClickListener(this);
         findViewById(R.id.btnDeleteNote).setOnClickListener(this);
+        findViewById(R.id.btnRefresh).setOnClickListener(this);
     }
 
     @Override
@@ -94,6 +98,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btnDeleteNote:
                 deleteNewestNote();
                 break;
+            case R.id.btnRefresh:
+                updateListView();
             //This shouldn't happen
             default:
                 break;
@@ -101,7 +107,8 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     //Create a new note with the title "New Note" and content "Note Content"
-    void createNewNote(String noteTitle) {
+    void createNewNote(String noteTitle)
+    {
         //Create a ContentValues object
         ContentValues myCV = new ContentValues();
         //Put key_value pairs based on the column names, and the values
@@ -156,7 +163,7 @@ public class HomeActivity extends AppCompatActivity implements View.OnClickListe
         updateListView();
     }
 
-    void updateListView() {
+    public void updateListView() {
         String[] projection = {
                 ToDoProvider.TODO_TABLE_COL_ID,
                 ToDoProvider.TODO_TABLE_COL_TITLE,

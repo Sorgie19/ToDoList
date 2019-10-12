@@ -19,12 +19,15 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Calendar;
 
 import static com.csce4623.ahnelson.todolist.ToDoProvider.TODO_TABLE_COL_CONTENT;
 import static com.csce4623.ahnelson.todolist.ToDoProvider.TODO_TABLE_COL_TITLE;
@@ -42,6 +45,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
     public static final String Connected = "connectivityKey";
     SharedPreferences sharedpreferences;
     int connectivityStatus;
+    String FILENAME = "save_file.txt";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -128,6 +132,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         if(sharedpreferences.getInt(Connected, connectivityStatus) == 0) {
             ContentValues myCV = new ContentValues();
             //Put key_value pairs based on the column names, and the values
+            myCV.put(TODO_TABLE_COL_TITLE, noteTitle.getText().toString());
             myCV.put(ToDoProvider.TODO_TABLE_COL_CONTENT, noteContent.getText().toString());
             myCV.put(ToDoProvider.TODO_TABLE_COL_DATE, datePicker.getText().toString());
             if (taskDone.isChecked())
@@ -148,10 +153,8 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
             else
                 checkedBox = 0;
 
-            String lineToWrite = titleOfNote + " " + contentOfNote + " " + dueDate + " " + checkedBox + "\n";
-
-
-
+            String lineToWrite = position +"}" + titleOfNote + "}" + contentOfNote + "}" + dueDate + "}" + checkedBox + "}\n";
+            writeFile(lineToWrite);
         }
 
     }
@@ -168,16 +171,7 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
                 .setCancelable(false)
                 .setPositiveButton("Create", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogBox, int id) {
-                        if(sharedpreferences.getInt(Connected, connectivityStatus) == 0) {
-                            ContentValues myCV = new ContentValues();
-                            myCV.put(TODO_TABLE_COL_TITLE, userInputDialogEditText.getText().toString());
-                            getContentResolver().update(ToDoProvider.CONTENT_URI, myCV, ToDoProvider.TODO_TABLE_COL_ID + "=?", new String[]{String.valueOf(position + 1)});
-                            noteTitle.setText(userInputDialogEditText.getText().toString());
-                        }
-                        else
-                        {
-
-                        }
+                        noteTitle.setText(userInputDialogEditText.getText().toString());
                     }
                 })
 
@@ -192,7 +186,24 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         alertDialogAndroid.show();
     }
 
-
-
-
+    public void writeFile(String lineToWrite)
+    {
+        FileOutputStream output = null;
+        try{
+            output = openFileOutput(FILENAME, MODE_APPEND);
+            output.write(lineToWrite.getBytes());
+            //Toast.makeText(this, "Saved to " + getFilesDir() + "/" + FILENAME, Toast.LENGTH_LONG).show();
+        }
+        catch (FileNotFoundException e){e.printStackTrace();}
+        catch (IOException e){e.printStackTrace();}
+        finally {
+            if(output != null) {
+                try {
+                    output.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 }

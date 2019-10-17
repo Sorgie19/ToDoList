@@ -54,6 +54,9 @@ public class NoteActivity extends AppCompatActivity implements View.OnClickListe
         initializeComponents();
 
         position = getIntent().getExtras().getInt("POSITION");
+
+        String test = String.valueOf(position);
+        Toast.makeText(getApplicationContext(), test, Toast.LENGTH_SHORT).show();
         save = (Button) findViewById(R.id.btnSave);
         noteContent = (EditText) findViewById(R.id.etNoteContent);
         datePicker = (EditText) findViewById(R.id.etDatePicker);
